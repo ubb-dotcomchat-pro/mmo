@@ -113,12 +113,20 @@ select {
   align-items: center;
 }
 
-#game-canvas {
+#game-root {
   width: min(100%, 640px);
+  min-height: 640px;
   border: 1px solid #334155;
   border-radius: 0.75rem;
-  image-rendering: pixelated;
   background: #0b1120;
+  overflow: hidden;
+}
+
+#game-root canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  image-rendering: pixelated;
 }
 
 .columns > section {

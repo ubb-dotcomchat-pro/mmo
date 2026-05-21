@@ -23,5 +23,8 @@
   "bugs": {
     "url": "https://github.com/ubb-dotcomchat-pro/mmo/issues"
   },
-  "homepage": "https://github.com/ubb-dotcomchat-pro/mmo#readme"
+  "homepage": "https://github.com/ubb-dotcomchat-pro/mmo#readme",
+  "dependencies": {
+    "phaser": "^3.90.0"
+  }
 }

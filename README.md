@@ -1,6 +1,6 @@
 # MMO RPG Prototype
 
-This repository now contains a runnable first playable slice for a browser MMO RPG with controllable characters.
+This repository now contains a runnable first playable slice for a browser MMO RPG with controllable characters, rendered with PhaserJS on the client.
 
 ## Target decisions
 
@@ -28,13 +28,14 @@ The current prototype includes:
 
 - `/home/runner/work/mmo/mmo/src/server.js` — HTTP API and static asset hosting
 - `/home/runner/work/mmo/mmo/src/world.js` — authoritative world simulation, account state, and validation
-- `/home/runner/work/mmo/mmo/public/app.js` — browser client, input mapping, rendering, and polling
+- `/home/runner/work/mmo/mmo/public/app.js` — PhaserJS browser client, input mapping, rendering, and polling
 - `/home/runner/work/mmo/mmo/data/*.json` — archetypes, zones, NPCs, and save schema scaffolding
 
 ## How to run
 
 ```bash
 cd /home/runner/work/mmo/mmo
+npm install
 npm start
 ```
 
