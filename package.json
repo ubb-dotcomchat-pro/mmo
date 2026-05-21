@@ -1,0 +1,27 @@
+{
+  "name": "mmo",
+  "version": "1.0.0",
+  "description": "Browser MMO RPG prototype with controllable characters",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node --test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ubb-dotcomchat-pro/mmo.git"
+  },
+  "keywords": [
+    "mmo",
+    "rpg",
+    "multiplayer",
+    "browser-game"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/ubb-dotcomchat-pro/mmo/issues"
+  },
+  "homepage": "https://github.com/ubb-dotcomchat-pro/mmo#readme"
+}

@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MMO RPG Prototype</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <main class="layout">
+      <section class="panel auth-panel">
+        <h1>MMO RPG Prototype</h1>
+        <p class="subtle">Browser-based, top-down, single-avatar MMO slice with authoritative movement.</p>
+        <form id="login-form" class="stack">
+          <label>
+            Username
+            <input id="username" name="username" type="text" maxlength="16" placeholder="ExplorerOne" required>
+          </label>
+          <button type="submit">Login</button>
+        </form>
+        <div id="character-panel" class="stack hidden">
+          <div>
+            <h2>Characters</h2>
+            <ul id="character-list" class="character-list"></ul>
+          </div>
+          <form id="create-character-form" class="stack compact">
+            <label>
+              Character name
+              <input id="character-name" name="characterName" type="text" maxlength="16" placeholder="Kael" required>
+            </label>
+            <label>
+              Archetype
+              <select id="archetype-select" name="archetype"></select>
+            </label>
+            <button type="submit">Create character</button>
+          </form>
+        </div>
+      </section>
+
+      <section class="panel game-panel hidden" id="game-panel">
+        <div class="hud">
+          <div>
+            <h2 id="zone-name">Zone</h2>
+            <p id="status-line" class="subtle">Login and select a character to start.</p>
+          </div>
+          <div class="controls">
+            <button id="interact-button" type="button">Talk to NPC</button>
+            <button id="teleport-button" type="button">Teleport to Town Square</button>
+            <button id="inspect-button" type="button">Inspect snapshot</button>
+          </div>
+        </div>
+        <canvas id="game-canvas" width="640" height="640" aria-label="game world"></canvas>
+        <div class="columns">
+          <section>
+            <h3>Character</h3>
+            <pre id="character-stats" class="data-box"></pre>
+          </section>
+          <section>
+            <h3>World Chat</h3>
+            <div id="chat-log" class="chat-log"></div>
+            <form id="chat-form" class="chat-form">
+              <input id="chat-input" name="chatMessage" type="text" maxlength="120" placeholder="Say something to nearby players">
+              <button type="submit">Send</button>
+            </form>
+          </section>
+          <section>
+            <h3>Inspect</h3>
+            <pre id="inspect-box" class="data-box"></pre>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <script src="/app.js" defer></script>
+  </body>
+</html>

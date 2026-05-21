@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CharacterSave",
+  "type": "object",
+  "required": ["id", "accountId", "name", "archetypeId", "zoneId", "x", "y", "stats", "abilities", "inventory"],
+  "properties": {
+    "id": { "type": "string" },
+    "accountId": { "type": "string" },
+    "name": { "type": "string" },
+    "archetypeId": { "type": "string" },
+    "zoneId": { "type": "string" },
+    "x": { "type": "integer" },
+    "y": { "type": "integer" },
+    "stats": { "type": "object" },
+    "abilities": { "type": "array", "items": { "type": "string" } },
+    "inventory": { "type": "array", "items": { "type": "string" } }
+  }
+}
