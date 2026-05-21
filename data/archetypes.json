@@ -1,0 +1,41 @@
+[
+  {
+    "id": "warden",
+    "name": "Warden",
+    "summary": "Durable front-liner with a shield and steady pace.",
+    "baseStats": {
+      "hp": 12,
+      "power": 3,
+      "agility": 2,
+      "spirit": 1
+    },
+    "abilities": ["Shield Bash", "Guard Stance"],
+    "startingInventory": ["Training Sword", "Traveler's Map"]
+  },
+  {
+    "id": "ranger",
+    "name": "Ranger",
+    "summary": "Fast scout with balanced mobility and precision.",
+    "baseStats": {
+      "hp": 10,
+      "power": 2,
+      "agility": 4,
+      "spirit": 1
+    },
+    "abilities": ["Quick Shot", "Trail Mark"],
+    "startingInventory": ["Practice Bow", "Trail Rations"]
+  },
+  {
+    "id": "mystic",
+    "name": "Mystic",
+    "summary": "Support caster focused on utility and arcane control.",
+    "baseStats": {
+      "hp": 8,
+      "power": 2,
+      "agility": 2,
+      "spirit": 5
+    },
+    "abilities": ["Arcane Pulse", "Soothing Light"],
+    "startingInventory": ["Apprentice Focus", "Spell Notes"]
+  }
+]

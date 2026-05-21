@@ -1,0 +1,46 @@
+[
+  {
+    "id": "starter-valley",
+    "name": "Starter Valley",
+    "width": 20,
+    "height": 20,
+    "spawn": {
+      "x": 2,
+      "y": 2
+    },
+    "landmarks": [
+      {
+        "id": "townSquare",
+        "label": "Town",
+        "x": 2,
+        "y": 2
+      },
+      {
+        "id": "questBoard",
+        "label": "Board",
+        "x": 4,
+        "y": 2
+      },
+      {
+        "id": "forestGate",
+        "label": "Gate",
+        "x": 15,
+        "y": 15
+      }
+    ],
+    "npcIds": ["guide-lina", "smith-oren"],
+    "blockedTiles": [
+      { "x": 7, "y": 7 },
+      { "x": 7, "y": 8 },
+      { "x": 7, "y": 9 },
+      { "x": 8, "y": 9 },
+      { "x": 9, "y": 9 },
+      { "x": 12, "y": 4 },
+      { "x": 13, "y": 4 },
+      { "x": 14, "y": 4 },
+      { "x": 5, "y": 14 },
+      { "x": 5, "y": 15 },
+      { "x": 5, "y": 16 }
+    ]
+  }
+]
