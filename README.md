@@ -35,6 +35,7 @@ The current prototype includes:
 
 ```bash
 cd /home/runner/work/mmo/mmo
+npm install
 npm start
 ```
 
