@@ -8,6 +8,9 @@ const { World } = require('./world');
 const content = loadContent();
 const world = new World(content);
 const publicDir = path.join(__dirname, '..', 'public');
+const vendorFiles = new Map([
+  ['/vendor/phaser.min.js', path.join(__dirname, '..', 'node_modules', 'phaser', 'dist', 'phaser.min.js')],
+]);
 const mimeTypes = {
   '.css': 'text/css; charset=utf-8',
   '.html': 'text/html; charset=utf-8',
@@ -46,6 +49,22 @@ function parseBody(request) {
 }
 
 function serveStatic(request, response) {
+  const vendorFilePath = vendorFiles.get(request.url);
+
+  if (vendorFilePath) {
+    fs.readFile(vendorFilePath, (error, file) => {
+      if (error) {
+        sendJson(response, 404, { error: 'not found' });
+        return;
+      }
+
+      const extension = path.extname(vendorFilePath);
+      response.writeHead(200, { 'Content-Type': mimeTypes[extension] ?? 'application/octet-stream' });
+      response.end(file);
+    });
+    return;
+  }
+
   const requestPath = request.url === '/' ? '/index.html' : request.url;
   const safePath = path.normalize(requestPath).replace(/^\.+/, '');
   const filePath = path.join(publicDir, safePath);

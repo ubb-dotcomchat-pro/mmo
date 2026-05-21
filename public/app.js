@@ -1,4 +1,4 @@
-const TILE_SIZE = 32;
+const VIEWPORT_SIZE = 640;
 const MOVE_KEYS = {
   ArrowUp: 'up',
   KeyW: 'up',
@@ -21,6 +21,8 @@ const state = {
   pollHandle: null,
   moveCooldown: false,
   interaction: null,
+  phaserGame: null,
+  worldRenderer: null,
 };
 
 const elements = {
@@ -32,7 +34,7 @@ const elements = {
   characterName: document.querySelector('#character-name'),
   archetypeSelect: document.querySelector('#archetype-select'),
   gamePanel: document.querySelector('#game-panel'),
-  canvas: document.querySelector('#game-canvas'),
+  gameRoot: document.querySelector('#game-root'),
   zoneName: document.querySelector('#zone-name'),
   statusLine: document.querySelector('#status-line'),
   characterStats: document.querySelector('#character-stats'),
@@ -44,8 +46,6 @@ const elements = {
   teleportButton: document.querySelector('#teleport-button'),
   inspectButton: document.querySelector('#inspect-button'),
 };
-
-const context = elements.canvas.getContext('2d');
 
 async function request(url, body) {
   const response = await fetch(url, {
@@ -70,9 +70,14 @@ function renderCharacterList() {
   for (const character of state.characters) {
     const item = document.createElement('li');
     const button = document.createElement('button');
+    const details = document.createElement('span');
+    const level = document.createElement('span');
+
     button.type = 'button';
     button.className = 'character-card';
-    button.innerHTML = `<span>${character.name} · ${character.archetypeId}</span><span>Lvl ${character.level}</span>`;
+    details.textContent = `${character.name} · ${character.archetypeId}`;
+    level.textContent = `Lvl ${character.level}`;
+    button.append(details, level);
     button.addEventListener('click', () => selectCharacter(character.id));
     item.appendChild(button);
     elements.characterList.appendChild(item);
@@ -94,8 +99,11 @@ function renderChatLog() {
   elements.chatLog.innerHTML = '';
   for (const entry of chatEntries) {
     const line = document.createElement('p');
+    const author = document.createElement('strong');
+
     line.className = 'chat-entry';
-    line.innerHTML = `<strong>${entry.author}:</strong> ${entry.message}`;
+    author.textContent = `${entry.author}:`;
+    line.append(author, ` ${entry.message}`);
     elements.chatLog.appendChild(line);
   }
 }
@@ -123,9 +131,150 @@ function renderStats() {
   );
 }
 
+function createWorldRenderer(scene) {
+  const backgroundLayer = scene.add.graphics();
+  const gridLayer = scene.add.graphics();
+  const blockedLayer = scene.add.graphics();
+  const entityLayer = scene.add.graphics();
+  const highlightLayer = scene.add.graphics();
+  const labels = [];
+
+  function clearLabels() {
+    while (labels.length > 0) {
+      labels.pop().destroy();
+    }
+  }
+
+  function drawLabel(text, x, y, fontSize = '12px') {
+    const label = scene.add.text(x, y, text, {
+      color: '#f8fafc',
+      fontFamily: 'Inter, system-ui, sans-serif',
+      fontSize,
+    });
+    labels.push(label);
+  }
+
+  function toPixels(originX, originY, tileSize, point) {
+    return {
+      x: originX + point.x * tileSize,
+      y: originY + point.y * tileSize,
+    };
+  }
+
+  return {
+    render(snapshot) {
+      clearLabels();
+      backgroundLayer.clear();
+      gridLayer.clear();
+      blockedLayer.clear();
+      entityLayer.clear();
+      highlightLayer.clear();
+
+      backgroundLayer.fillStyle(0x1f2937, 1);
+      backgroundLayer.fillRect(0, 0, VIEWPORT_SIZE, VIEWPORT_SIZE);
+
+      if (!snapshot) {
+        backgroundLayer.fillStyle(0x0b1120, 1);
+        backgroundLayer.fillRect(32, 32, VIEWPORT_SIZE - 64, VIEWPORT_SIZE - 64);
+        return;
+      }
+
+      const { zone, nearby, character } = snapshot;
+      const tileSize = Math.max(16, Math.floor(Math.min(VIEWPORT_SIZE / zone.width, VIEWPORT_SIZE / zone.height)));
+      const mapWidth = zone.width * tileSize;
+      const mapHeight = zone.height * tileSize;
+      const originX = Math.floor((VIEWPORT_SIZE - mapWidth) / 2);
+      const originY = Math.floor((VIEWPORT_SIZE - mapHeight) / 2);
+
+      backgroundLayer.fillStyle(0x0b1120, 1);
+      backgroundLayer.fillRect(originX, originY, mapWidth, mapHeight);
+
+      gridLayer.lineStyle(1, 0x334155, 1);
+      for (let y = 0; y < zone.height; y += 1) {
+        for (let x = 0; x < zone.width; x += 1) {
+          gridLayer.strokeRect(originX + x * tileSize, originY + y * tileSize, tileSize, tileSize);
+        }
+      }
+
+      blockedLayer.fillStyle(0x14532d, 1);
+      for (const tile of zone.blockedTiles) {
+        const position = toPixels(originX, originY, tileSize, tile);
+        blockedLayer.fillRect(position.x, position.y, tileSize, tileSize);
+      }
+
+      for (const landmark of zone.landmarks) {
+        const position = toPixels(originX, originY, tileSize, landmark);
+        entityLayer.fillStyle(0x78350f, 1);
+        entityLayer.fillRect(position.x, position.y, tileSize, tileSize);
+        drawLabel(landmark.label, position.x + 2, position.y + tileSize - 16, '10px');
+      }
+
+      for (const npc of nearby.npcs) {
+        const position = toPixels(originX, originY, tileSize, npc);
+        entityLayer.fillStyle(0xfacc15, 1);
+        entityLayer.fillCircle(position.x + tileSize / 2, position.y + tileSize / 2, tileSize / 3);
+        drawLabel(npc.name, position.x, position.y - 16);
+      }
+
+      for (const player of nearby.players) {
+        const position = toPixels(originX, originY, tileSize, player);
+        entityLayer.fillStyle(player.isSelf ? 0x22c55e : 0x60a5fa, 1);
+        entityLayer.fillCircle(position.x + tileSize / 2, position.y + tileSize / 2, tileSize / 3);
+        drawLabel(player.name, position.x, position.y - 16);
+      }
+
+      const highlightPosition = toPixels(originX, originY, tileSize, character);
+      highlightLayer.lineStyle(2, 0xe2e8f0, 1);
+      highlightLayer.strokeRect(highlightPosition.x, highlightPosition.y, tileSize, tileSize);
+    },
+  };
+}
+
+function initializePhaser() {
+  if (state.phaserGame) {
+    return;
+  }
+
+  if (typeof Phaser === 'undefined') {
+    throw new Error('Phaser failed to load');
+  }
+
+  state.phaserGame = new Phaser.Game({
+    type: Phaser.CANVAS,
+    width: VIEWPORT_SIZE,
+    height: VIEWPORT_SIZE,
+    parent: elements.gameRoot,
+    backgroundColor: '#0b1120',
+    scale: {
+      mode: Phaser.Scale.FIT,
+      autoCenter: Phaser.Scale.CENTER_BOTH,
+    },
+    render: {
+      antialias: false,
+      pixelArt: true,
+    },
+    scene: {
+      create() {
+        state.worldRenderer = createWorldRenderer(this);
+        state.worldRenderer.render(state.snapshot);
+      },
+    },
+  });
+}
+
+function drawWorld() {
+  if (!state.worldRenderer) {
+    return;
+  }
+
+  state.worldRenderer.render(state.snapshot);
+}
+
 function renderSnapshot() {
   if (!state.snapshot) {
     elements.inspectBox.textContent = 'Select a character to inspect the world snapshot.';
+    renderStats();
+    drawWorld();
     return;
   }
 
@@ -134,63 +283,6 @@ function renderSnapshot() {
   renderChatLog();
   renderStats();
   drawWorld();
-}
-
-function drawWorld() {
-  const snapshot = state.snapshot;
-  if (!snapshot) {
-    return;
-  }
-
-  const { zone, nearby, character } = snapshot;
-  const scale = Math.min(elements.canvas.width / zone.width, elements.canvas.height / zone.height);
-  const tileSize = Math.floor(scale);
-
-  context.clearRect(0, 0, elements.canvas.width, elements.canvas.height);
-  context.fillStyle = '#1f2937';
-  context.fillRect(0, 0, elements.canvas.width, elements.canvas.height);
-
-  context.strokeStyle = '#334155';
-  context.lineWidth = 1;
-  for (let y = 0; y < zone.height; y += 1) {
-    for (let x = 0; x < zone.width; x += 1) {
-      context.strokeRect(x * tileSize, y * tileSize, tileSize, tileSize);
-    }
-  }
-
-  context.fillStyle = '#14532d';
-  for (const tile of zone.blockedTiles) {
-    context.fillRect(tile.x * tileSize, tile.y * tileSize, tileSize, tileSize);
-  }
-
-  for (const landmark of zone.landmarks) {
-    context.fillStyle = '#78350f';
-    context.fillRect(landmark.x * tileSize, landmark.y * tileSize, tileSize, tileSize);
-    context.fillStyle = '#f8fafc';
-    context.font = '10px sans-serif';
-    context.fillText(landmark.label, landmark.x * tileSize + 2, landmark.y * tileSize + tileSize - 6);
-  }
-
-  for (const npc of nearby.npcs) {
-    context.fillStyle = '#facc15';
-    context.beginPath();
-    context.arc((npc.x + 0.5) * tileSize, (npc.y + 0.5) * tileSize, tileSize / 3, 0, Math.PI * 2);
-    context.fill();
-    context.fillStyle = '#f8fafc';
-    context.fillText(npc.name, npc.x * tileSize, npc.y * tileSize - 4);
-  }
-
-  for (const player of nearby.players) {
-    context.fillStyle = player.isSelf ? '#22c55e' : '#60a5fa';
-    context.beginPath();
-    context.arc((player.x + 0.5) * tileSize, (player.y + 0.5) * tileSize, tileSize / 3, 0, Math.PI * 2);
-    context.fill();
-    context.fillStyle = '#f8fafc';
-    context.fillText(player.name, player.x * tileSize, player.y * tileSize - 4);
-  }
-
-  context.strokeStyle = '#e2e8f0';
-  context.strokeRect(character.x * tileSize, character.y * tileSize, tileSize, tileSize);
 }
 
 async function refreshSnapshot() {
@@ -352,6 +444,7 @@ function bindEvents() {
 async function bootstrap() {
   state.bootstrap = await request('/api/bootstrap');
   renderArchetypes();
+  initializePhaser();
   renderSnapshot();
   bindEvents();
   setMessage('Login with a username to start the first MMO slice.');

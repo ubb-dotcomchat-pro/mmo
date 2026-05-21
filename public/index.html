@@ -49,7 +49,7 @@
             <button id="inspect-button" type="button">Inspect snapshot</button>
           </div>
         </div>
-        <canvas id="game-canvas" width="640" height="640" aria-label="game world"></canvas>
+        <div id="game-root" aria-label="game world"></div>
         <div class="columns">
           <section>
             <h3>Character</h3>
@@ -71,6 +71,7 @@
       </section>
     </main>
 
+    <script src="/vendor/phaser.min.js" defer></script>
     <script src="/app.js" defer></script>
   </body>
 </html>
