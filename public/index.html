@@ -10,7 +10,7 @@
     <main class="layout">
       <section class="panel auth-panel">
         <h1>MMO RPG Prototype</h1>
-        <p class="subtle">Browser-based, top-down, single-avatar MMO slice with authoritative movement.</p>
+        <p class="subtle">Browser-based, top-down MMO slice with shared movement, vendor trading, and real-time monster combat.</p>
         <form id="login-form" class="stack">
           <label>
             Username
@@ -44,17 +44,36 @@
             <p id="status-line" class="subtle">Login and select a character to start.</p>
           </div>
           <div class="controls">
-            <button id="interact-button" type="button">Talk to NPC</button>
+            <button id="interact-button" type="button">Interact with NPC</button>
             <button id="teleport-button" type="button">Teleport to Town Square</button>
             <button id="inspect-button" type="button">Inspect snapshot</button>
           </div>
         </div>
         <div id="game-root" aria-label="game world"></div>
-        <div class="columns">
+        <div class="columns gameplay-columns">
           <section>
             <h3>Character</h3>
             <pre id="character-stats" class="data-box"></pre>
           </section>
+          <section>
+            <h3>Equipment</h3>
+            <ul id="equipment-list" class="item-list"></ul>
+          </section>
+          <section>
+            <h3>Inventory</h3>
+            <p id="inventory-hint" class="subtle compact-copy"></p>
+            <ul id="inventory-list" class="item-list"></ul>
+          </section>
+          <section id="shop-panel" class="hidden">
+            <h3 id="shop-title">Shop</h3>
+            <ul id="shop-list" class="item-list"></ul>
+          </section>
+          <section>
+            <h3>Nearby Monsters</h3>
+            <ul id="monster-list" class="item-list"></ul>
+          </section>
+        </div>
+        <div class="columns">
           <section>
             <h3>World Chat</h3>
             <div id="chat-log" class="chat-log"></div>

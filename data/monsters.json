@@ -1,0 +1,31 @@
+[
+  {
+    "id": "green-slime",
+    "zoneId": "starter-valley",
+    "name": "Green Slime",
+    "hp": 7,
+    "power": 2,
+    "agility": 1,
+    "experience": 4,
+    "goldDrop": 3,
+    "spawnWeight": 0.65,
+    "itemDrops": [
+      { "itemId": "slime-gel", "chance": 0.5 }
+    ]
+  },
+  {
+    "id": "valley-wolf",
+    "zoneId": "starter-valley",
+    "name": "Valley Wolf",
+    "hp": 10,
+    "power": 3,
+    "agility": 3,
+    "experience": 6,
+    "goldDrop": 5,
+    "spawnWeight": 0.35,
+    "itemDrops": [
+      { "itemId": "wolf-pelt", "chance": 0.45 },
+      { "itemId": "fang-dagger", "chance": 0.2 }
+    ]
+  }
+]

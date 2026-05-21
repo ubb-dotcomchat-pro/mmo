@@ -34,6 +34,14 @@ button:hover {
   background: #1d4ed8;
 }
 
+.secondary-button {
+  background: #334155;
+}
+
+.secondary-button:hover {
+  background: #475569;
+}
+
 input,
 select {
   width: 100%;
@@ -68,6 +76,10 @@ select {
   gap: 0.75rem;
 }
 
+.compact-copy {
+  margin: 0 0 0.75rem;
+}
+
 .subtle {
   color: #94a3b8;
 }
@@ -76,7 +88,8 @@ select {
   display: none;
 }
 
-.character-list {
+.character-list,
+.item-list {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -106,6 +119,10 @@ select {
   gap: 1rem;
 }
 
+.gameplay-columns > section {
+  min-width: 220px;
+}
+
 .controls {
   display: flex;
   flex-wrap: wrap;
@@ -130,13 +147,14 @@ select {
 }
 
 .columns > section {
-  flex: 1 1 220px;
+  flex: 1 1 320px;
 }
 
 .chat-log,
-.data-box {
+.data-box,
+.item-list {
   min-height: 220px;
-  max-height: 280px;
+  max-height: 320px;
   overflow: auto;
   border-radius: 0.75rem;
   border: 1px solid #334155;
@@ -162,8 +180,43 @@ select {
   color: #f8fafc;
 }
 
+.list-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  background: #0f172a;
+}
+
+.list-row strong,
+.list-row span {
+  display: block;
+}
+
+.list-row span {
+  color: #94a3b8;
+  margin-top: 0.25rem;
+}
+
+.list-row button {
+  white-space: nowrap;
+}
+
+.inline-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
 @media (max-width: 960px) {
   .layout {
     grid-template-columns: 1fr;
+  }
+
+  .chat-form {
+    flex-direction: column;
   }
 }

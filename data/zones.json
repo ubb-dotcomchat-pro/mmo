@@ -29,6 +29,12 @@
       }
     ],
     "npcIds": ["guide-lina", "smith-oren"],
+    "monsterIds": ["green-slime", "valley-wolf"],
+    "monsterSpawn": {
+      "maxAlive": 4,
+      "minIntervalMs": 1200,
+      "maxIntervalMs": 2800
+    },
     "blockedTiles": [
       { "x": 7, "y": 7 },
       { "x": 7, "y": 8 },

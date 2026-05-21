@@ -1,0 +1,127 @@
+[
+  {
+    "id": "training-sword",
+    "name": "Training Sword",
+    "slot": "weapon",
+    "value": 10,
+    "statBonuses": {
+      "power": 2
+    }
+  },
+  {
+    "id": "practice-bow",
+    "name": "Practice Bow",
+    "slot": "weapon",
+    "value": 10,
+    "statBonuses": {
+      "power": 1,
+      "agility": 1
+    }
+  },
+  {
+    "id": "apprentice-focus",
+    "name": "Apprentice Focus",
+    "slot": "weapon",
+    "value": 11,
+    "statBonuses": {
+      "spirit": 2
+    }
+  },
+  {
+    "id": "traveler-shield",
+    "name": "Traveler Shield",
+    "slot": "shield",
+    "value": 9,
+    "statBonuses": {
+      "hp": 3
+    }
+  },
+  {
+    "id": "wooden-buckler",
+    "name": "Wooden Buckler",
+    "slot": "shield",
+    "value": 14,
+    "statBonuses": {
+      "hp": 4,
+      "power": 1
+    }
+  },
+  {
+    "id": "leather-armor",
+    "name": "Leather Armor",
+    "slot": "armor",
+    "value": 12,
+    "statBonuses": {
+      "hp": 4,
+      "agility": 1
+    }
+  },
+  {
+    "id": "iron-cuirass",
+    "name": "Iron Cuirass",
+    "slot": "armor",
+    "value": 15,
+    "statBonuses": {
+      "hp": 6
+    }
+  },
+  {
+    "id": "cloth-robe",
+    "name": "Cloth Robe",
+    "slot": "armor",
+    "value": 12,
+    "statBonuses": {
+      "hp": 3,
+      "spirit": 1
+    }
+  },
+  {
+    "id": "lucky-charm",
+    "name": "Lucky Charm",
+    "slot": "charm",
+    "value": 8,
+    "statBonuses": {
+      "agility": 1,
+      "spirit": 1
+    }
+  },
+  {
+    "id": "silver-charm",
+    "name": "Silver Charm",
+    "slot": "charm",
+    "value": 14,
+    "statBonuses": {
+      "power": 1,
+      "spirit": 2
+    }
+  },
+  {
+    "id": "slime-gel",
+    "name": "Slime Gel",
+    "slot": "charm",
+    "value": 6,
+    "statBonuses": {
+      "hp": 2
+    }
+  },
+  {
+    "id": "fang-dagger",
+    "name": "Fang Dagger",
+    "slot": "weapon",
+    "value": 18,
+    "statBonuses": {
+      "power": 2,
+      "agility": 2
+    }
+  },
+  {
+    "id": "wolf-pelt",
+    "name": "Wolf Pelt",
+    "slot": "armor",
+    "value": 10,
+    "statBonuses": {
+      "hp": 3,
+      "agility": 1
+    }
+  }
+]

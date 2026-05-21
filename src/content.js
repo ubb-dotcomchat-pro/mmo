@@ -13,11 +13,17 @@ function byId(items) {
 function loadContent() {
   const zones = readJsonFile('zones.json');
   const archetypes = readJsonFile('archetypes.json');
+  const items = readJsonFile('items.json');
+  const monsters = readJsonFile('monsters.json');
   const npcs = readJsonFile('npcs.json');
 
   return {
     archetypes,
     archetypesById: byId(archetypes),
+    items,
+    itemsById: byId(items),
+    monsters,
+    monstersById: byId(monsters),
     npcs,
     zones,
     zonesById: byId(zones),

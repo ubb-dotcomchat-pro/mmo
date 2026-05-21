@@ -21,6 +21,7 @@ const state = {
   pollHandle: null,
   moveCooldown: false,
   interaction: null,
+  openShop: null,
   phaserGame: null,
   worldRenderer: null,
 };
@@ -45,6 +46,13 @@ const elements = {
   interactButton: document.querySelector('#interact-button'),
   teleportButton: document.querySelector('#teleport-button'),
   inspectButton: document.querySelector('#inspect-button'),
+  equipmentList: document.querySelector('#equipment-list'),
+  inventoryList: document.querySelector('#inventory-list'),
+  inventoryHint: document.querySelector('#inventory-hint'),
+  shopPanel: document.querySelector('#shop-panel'),
+  shopTitle: document.querySelector('#shop-title'),
+  shopList: document.querySelector('#shop-list'),
+  monsterList: document.querySelector('#monster-list'),
 };
 
 async function request(url, body) {
@@ -76,7 +84,7 @@ function renderCharacterList() {
     button.type = 'button';
     button.className = 'character-card';
     details.textContent = `${character.name} · ${character.archetypeId}`;
-    level.textContent = `Lvl ${character.level}`;
+    level.textContent = `Lvl ${character.level} · ${character.gold ?? 0}g`;
     button.append(details, level);
     button.addEventListener('click', () => selectCharacter(character.id));
     item.appendChild(button);
@@ -108,6 +116,166 @@ function renderChatLog() {
   }
 }
 
+function formatBonuses(item) {
+  return Object.entries(item.statBonuses)
+    .map(([statName, value]) => `+${value} ${statName}`)
+    .join(', ');
+}
+
+function createActionButton(label, handler, variant = '') {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.textContent = label;
+  button.className = variant;
+  button.addEventListener('click', handler);
+  return button;
+}
+
+function renderEquipment() {
+  const character = state.snapshot?.character;
+  elements.equipmentList.innerHTML = '';
+  if (!character) {
+    return;
+  }
+
+  for (const [slot, item] of Object.entries(character.equipment)) {
+    const row = document.createElement('li');
+    row.className = 'list-row';
+
+    const details = document.createElement('div');
+    details.innerHTML = `<strong>${slot}</strong><span>${item ? `${item.name} · ${formatBonuses(item)}` : 'Empty'}</span>`;
+    row.appendChild(details);
+
+    if (item) {
+      row.appendChild(
+        createActionButton('Unequip', () => {
+          unequipItem(slot).catch((error) => setMessage(error.message));
+        }),
+      );
+    }
+
+    elements.equipmentList.appendChild(row);
+  }
+}
+
+function renderInventory() {
+  const character = state.snapshot?.character;
+  elements.inventoryList.innerHTML = '';
+  if (!character) {
+    return;
+  }
+
+  elements.inventoryHint.textContent = state.openShop
+    ? `Shop open with ${state.openShop.name}. Sell items directly from your inventory.`
+    : 'Equip gear from your inventory. Open a nearby vendor shop to sell loot.';
+
+  for (const item of character.inventory) {
+    const row = document.createElement('li');
+    row.className = 'list-row';
+
+    const details = document.createElement('div');
+    details.innerHTML = `<strong>${item.name} ×${item.quantity}</strong><span>${item.slot} · ${item.value}g · ${formatBonuses(item)}</span>`;
+    row.appendChild(details);
+
+    const actions = document.createElement('div');
+    actions.className = 'inline-actions';
+    actions.appendChild(
+      createActionButton('Equip', () => {
+        equipItem(item.id).catch((error) => setMessage(error.message));
+      }),
+    );
+
+    if (state.openShop) {
+      actions.appendChild(
+        createActionButton(
+          `Sell ${Math.max(1, Math.floor(item.value / 2))}g`,
+          () => {
+            sellItem(state.openShop.npcId, item.id).catch((error) => setMessage(error.message));
+          },
+          'secondary-button',
+        ),
+      );
+    }
+
+    row.appendChild(actions);
+    elements.inventoryList.appendChild(row);
+  }
+
+  if (character.inventory.length === 0) {
+    const empty = document.createElement('li');
+    empty.className = 'list-row';
+    empty.textContent = 'Inventory is empty.';
+    elements.inventoryList.appendChild(empty);
+  }
+}
+
+function renderShop() {
+  elements.shopList.innerHTML = '';
+  if (!state.openShop) {
+    elements.shopPanel.classList.add('hidden');
+    return;
+  }
+
+  elements.shopPanel.classList.remove('hidden');
+  elements.shopTitle.textContent = `Shop · ${state.openShop.name}`;
+
+  for (const item of state.openShop.stock) {
+    const row = document.createElement('li');
+    row.className = 'list-row';
+
+    const details = document.createElement('div');
+    details.innerHTML = `<strong>${item.name}</strong><span>${item.slot} · ${item.value}g · ${formatBonuses(item)}</span>`;
+    row.appendChild(details);
+    row.appendChild(
+      createActionButton('Buy', () => {
+        buyItem(state.openShop.npcId, item.id).catch((error) => setMessage(error.message));
+      }),
+    );
+    elements.shopList.appendChild(row);
+  }
+}
+
+function renderMonsters() {
+  const character = state.snapshot?.character;
+  const monsters = state.snapshot?.nearby.monsters ?? [];
+  elements.monsterList.innerHTML = '';
+
+  if (!character || monsters.length === 0) {
+    const empty = document.createElement('li');
+    empty.className = 'list-row';
+    empty.textContent = 'No nearby monsters right now.';
+    elements.monsterList.appendChild(empty);
+    return;
+  }
+
+  for (const monster of monsters) {
+    const row = document.createElement('li');
+    row.className = 'list-row';
+
+    const details = document.createElement('div');
+    const targetLabel = character.targetMonsterId === monster.id ? ' · Targeted' : '';
+    details.innerHTML = `<strong>${monster.name}${targetLabel}</strong><span>${monster.hp}/${monster.maxHp} HP · ${monster.state}</span>`;
+    row.appendChild(details);
+
+    const actions = document.createElement('div');
+    actions.className = 'inline-actions';
+    actions.appendChild(
+      createActionButton('Attack', () => {
+        targetMonster(monster.id).catch((error) => setMessage(error.message));
+      }),
+    );
+    if (character.targetMonsterId === monster.id) {
+      actions.appendChild(
+        createActionButton('Stop', () => {
+          clearTarget().catch((error) => setMessage(error.message));
+        }, 'secondary-button'),
+      );
+    }
+    row.appendChild(actions);
+    elements.monsterList.appendChild(row);
+  }
+}
+
 function renderStats() {
   const character = state.snapshot?.character;
   if (!character) {
@@ -120,11 +288,13 @@ function renderStats() {
       name: character.name,
       archetype: character.archetypeId,
       level: character.level,
+      experience: character.experience,
       hp: `${character.hp}/${character.maxHp}`,
+      gold: character.gold,
       state: character.state,
-      abilities: character.abilities,
-      inventory: character.inventory,
+      targetMonsterId: character.targetMonsterId,
       stats: character.stats,
+      abilities: character.abilities,
     },
     null,
     2,
@@ -216,6 +386,13 @@ function createWorldRenderer(scene) {
         drawLabel(npc.name, position.x, position.y - 16);
       }
 
+      for (const monster of nearby.monsters) {
+        const position = toPixels(originX, originY, tileSize, monster);
+        entityLayer.fillStyle(0xef4444, 1);
+        entityLayer.fillCircle(position.x + tileSize / 2, position.y + tileSize / 2, tileSize / 3);
+        drawLabel(`${monster.name} ${monster.hp}/${monster.maxHp}`, position.x - 6, position.y - 16, '10px');
+      }
+
       for (const player of nearby.players) {
         const position = toPixels(originX, originY, tileSize, player);
         entityLayer.fillStyle(player.isSelf ? 0x22c55e : 0x60a5fa, 1);
@@ -274,6 +451,10 @@ function renderSnapshot() {
   if (!state.snapshot) {
     elements.inspectBox.textContent = 'Select a character to inspect the world snapshot.';
     renderStats();
+    renderEquipment();
+    renderInventory();
+    renderShop();
+    renderMonsters();
     drawWorld();
     return;
   }
@@ -282,6 +463,10 @@ function renderSnapshot() {
   elements.zoneName.textContent = state.snapshot.zone.name;
   renderChatLog();
   renderStats();
+  renderEquipment();
+  renderInventory();
+  renderShop();
+  renderMonsters();
   drawWorld();
 }
 
@@ -326,9 +511,10 @@ async function selectCharacter(characterId) {
   });
   state.selectedCharacterId = characterId;
   state.snapshot = payload.snapshot;
+  state.openShop = null;
   elements.gamePanel.classList.remove('hidden');
   renderSnapshot();
-  setMessage(`Controlling ${payload.character.name}. Move with WASD or arrow keys.`);
+  setMessage(`Controlling ${payload.character.name}. Move with WASD or arrow keys, then fight or trade.`);
 
   if (state.pollHandle) {
     clearInterval(state.pollHandle);
@@ -365,7 +551,8 @@ async function talkToNpc() {
   });
   state.snapshot = payload.snapshot;
   state.interaction = payload.npc;
-  setMessage(`${payload.npc.name}: ${payload.npc.dialog}`);
+  state.openShop = payload.shop;
+  setMessage(payload.shop ? `${payload.npc.name}: ${payload.npc.dialog}` : `${payload.npc.name}: ${payload.npc.dialog}`);
   renderSnapshot();
 }
 
@@ -388,6 +575,73 @@ async function teleport() {
   });
   state.snapshot = payload.snapshot;
   setMessage('Teleported to the town square.');
+  renderSnapshot();
+}
+
+async function equipItem(itemId) {
+  const payload = await request('/api/world/equipment/equip', {
+    token: state.token,
+    characterId: state.selectedCharacterId,
+    itemId,
+  });
+  state.snapshot = payload.snapshot;
+  setMessage(`Equipped ${payload.item.name}.`);
+  renderSnapshot();
+}
+
+async function unequipItem(slot) {
+  const payload = await request('/api/world/equipment/unequip', {
+    token: state.token,
+    characterId: state.selectedCharacterId,
+    slot,
+  });
+  state.snapshot = payload.snapshot;
+  setMessage(`Unequipped ${slot}.`);
+  renderSnapshot();
+}
+
+async function buyItem(npcId, itemId) {
+  const payload = await request('/api/world/shop/buy', {
+    token: state.token,
+    characterId: state.selectedCharacterId,
+    npcId,
+    itemId,
+  });
+  state.snapshot = payload.snapshot;
+  setMessage(`Bought ${payload.item.name}.`);
+  renderSnapshot();
+}
+
+async function sellItem(npcId, itemId) {
+  const payload = await request('/api/world/shop/sell', {
+    token: state.token,
+    characterId: state.selectedCharacterId,
+    npcId,
+    itemId,
+  });
+  state.snapshot = payload.snapshot;
+  setMessage(`Sold item for ${payload.goldEarned} gold.`);
+  renderSnapshot();
+}
+
+async function targetMonster(monsterId) {
+  const payload = await request('/api/world/combat/target', {
+    token: state.token,
+    characterId: state.selectedCharacterId,
+    monsterId,
+  });
+  state.snapshot = payload.snapshot;
+  setMessage('Combat engaged. Stay close to keep attacking in real time.');
+  renderSnapshot();
+}
+
+async function clearTarget() {
+  const payload = await request('/api/world/combat/clear-target', {
+    token: state.token,
+    characterId: state.selectedCharacterId,
+  });
+  state.snapshot = payload.snapshot;
+  setMessage('Stopped attacking.');
   renderSnapshot();
 }
 
@@ -447,7 +701,7 @@ async function bootstrap() {
   initializePhaser();
   renderSnapshot();
   bindEvents();
-  setMessage('Login with a username to start the first MMO slice.');
+  setMessage('Login with a username to start the MMO slice with shops, monsters, and combat.');
 }
 
 bootstrap().catch((error) => {

@@ -129,6 +129,36 @@ async function routeApi(request, response) {
     return;
   }
 
+  if (request.method === 'POST' && request.url === '/api/world/equipment/equip') {
+    sendJson(response, 200, world.equipItem(body.token, body.characterId, body.itemId));
+    return;
+  }
+
+  if (request.method === 'POST' && request.url === '/api/world/equipment/unequip') {
+    sendJson(response, 200, world.unequipItem(body.token, body.characterId, body.slot));
+    return;
+  }
+
+  if (request.method === 'POST' && request.url === '/api/world/shop/buy') {
+    sendJson(response, 200, world.buyItem(body.token, body.characterId, body.npcId, body.itemId));
+    return;
+  }
+
+  if (request.method === 'POST' && request.url === '/api/world/shop/sell') {
+    sendJson(response, 200, world.sellItem(body.token, body.characterId, body.npcId, body.itemId));
+    return;
+  }
+
+  if (request.method === 'POST' && request.url === '/api/world/combat/target') {
+    sendJson(response, 200, world.targetMonster(body.token, body.characterId, body.monsterId));
+    return;
+  }
+
+  if (request.method === 'POST' && request.url === '/api/world/combat/clear-target') {
+    sendJson(response, 200, world.clearCombatTarget(body.token, body.characterId));
+    return;
+  }
+
   if (request.method === 'POST' && request.url === '/api/world/chat') {
     sendJson(response, 200, world.sendChat(body.token, body.characterId, body.message));
     return;

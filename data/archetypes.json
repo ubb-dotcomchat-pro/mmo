@@ -10,7 +10,7 @@
       "spirit": 1
     },
     "abilities": ["Shield Bash", "Guard Stance"],
-    "startingInventory": ["Training Sword", "Traveler's Map"]
+    "startingInventory": ["training-sword", "traveler-shield", "iron-cuirass"]
   },
   {
     "id": "ranger",
@@ -23,7 +23,7 @@
       "spirit": 1
     },
     "abilities": ["Quick Shot", "Trail Mark"],
-    "startingInventory": ["Practice Bow", "Trail Rations"]
+    "startingInventory": ["practice-bow", "leather-armor", "lucky-charm"]
   },
   {
     "id": "mystic",
@@ -36,6 +36,6 @@
       "spirit": 5
     },
     "abilities": ["Arcane Pulse", "Soothing Light"],
-    "startingInventory": ["Apprentice Focus", "Spell Notes"]
+    "startingInventory": ["apprentice-focus", "cloth-robe", "silver-charm"]
   }
 ]

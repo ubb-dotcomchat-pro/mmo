@@ -6,7 +6,7 @@
     "role": "tutorial",
     "x": 3,
     "y": 2,
-    "dialog": "Use WASD or the arrow keys to move, then open another tab with a different username to see a second player in the valley."
+    "dialog": "Use WASD or the arrow keys to move. Smith Oren can trade gear, and the wilds outside town now spawn monsters in real time."
   },
   {
     "id": "smith-oren",
@@ -15,6 +15,7 @@
     "role": "vendor",
     "x": 4,
     "y": 3,
-    "dialog": "The next milestone is combat and inventory persistence. For now, I can only offer advice."
+    "dialog": "Need better gear? Step close and interact to browse my wares or sell what you find from monsters.",
+    "shopInventory": ["training-sword", "wooden-buckler", "leather-armor", "silver-charm"]
   }
 ]
